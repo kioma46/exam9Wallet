@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>exam9Wallet</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\exam9Wallet.BLL\exam9Wallet.BLL.csproj" />
+      <ProjectReference Include="..\exam9Wallet.DAL\exam9Wallet.DAL.csproj" />
+    </ItemGroup>
+
+</Project>
