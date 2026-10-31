@@ -1,4 +1,5 @@
 
+using exam9Wallet.BLL.Services;
 using exam9Wallet.DAL.Data;
 using exam9Wallet.DAL.Models;
 using Microsoft.AspNetCore.Identity;
@@ -24,6 +25,8 @@ public class Program
             options.LoginPath = "/Account/Login";
             options.AccessDeniedPath = "/Account/AccessDenied";
         });
+        
+        builder.Services.AddScoped<UniqueCodeGeneratorService>();
         
         var app = builder.Build();
 

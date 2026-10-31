@@ -1,4 +1,4 @@
-﻿
+﻿using exam9Wallet.BLL.Services;
 using exam9Wallet.DAL.Models;
 using exam9Wallet.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -11,11 +11,13 @@ public class AccountController : Controller
 {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
+    private readonly UniqueCodeGeneratorService _uniqueCodeGeneratorService;
 
-    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,  UniqueCodeGeneratorService uniqueCodeGeneratorService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _uniqueCodeGeneratorService = uniqueCodeGeneratorService;
     }
     
     private int CurrentUserId => int.Parse(_userManager.GetUserId(User)!);
@@ -41,6 +43,7 @@ public class AccountController : Controller
                 Email = model.Email,
                 ProfilePictureUrl = model.ProfilePictureUrl,
                 DateOfBirth = model.DateOfBirth,
+                UniqueCode = await _uniqueCodeGeneratorService.GenerateUniqueCodeAsync()
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
