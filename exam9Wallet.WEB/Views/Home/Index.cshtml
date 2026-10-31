@@ -1,8 +1,58 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Главная страница";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    @if (User.Identity!.IsAuthenticated)
+    {
+        <p class="text-center">Вы успешно авторизовались!</p>
+    }
+    else
+    {
+        <p><a asp-controller="Account" asp-action="Login">Войти в аккаунт</a></p>
+    }
+    
+    @await Html.PartialAsync("~/Views/BalanceApi/_TopUpPartial.cshtml", new exam9Wallet.ViewModels.TopUpViewModel())
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $('#topUpForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const $alert = $('#alertContainer');
+            const $btn = $('#submitBtn');
+            
+            $alert.addClass('d-none').removeClass('alert-success alert-danger');
+
+            const formData = {
+                uniqueCode: parseInt($('#UniqueCode').val()),
+                amount: parseFloat($('#Amount').val())
+            };
+
+            $btn.prop('disabled', true).text('Обработка...');
+
+            $.ajax({
+                url: '/api/balance/topup',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    $alert.removeClass('d-none').addClass('alert-success').text(response.message);
+                    $('#topUpForm')[0].reset();
+                },
+                error: function (xhr) {
+                    let errorMessage = "Произошла ошибка при отправке запроса.";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    $alert.removeClass('d-none').addClass('alert-danger').text(errorMessage);
+                },
+                complete: function () {
+                    $btn.prop('disabled', false).text('Пополнить');
+                }
+            });
+        });
+    </script>
+}

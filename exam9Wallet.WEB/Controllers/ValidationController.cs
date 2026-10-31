@@ -34,4 +34,6 @@ public class ValidationController : Controller
     public bool ValidatePassword(string Password) => Password.Length >= 8 && Password.Any(char.IsDigit) && Password.Any(char.IsUpper) && Password.Any(c => !char.IsLetter(c));
 
     public bool ValidateDateOfBirth(DateTime DateOfBirth) => DateOfBirth <= DateTime.UtcNow.AddYears(-18);
+    
+    public bool ValidateAccountExists(int uniqueCode) => _userManager.Users.Any(u => u.UniqueCode == uniqueCode);
 }
