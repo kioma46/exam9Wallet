@@ -154,6 +154,70 @@ namespace exam9Wallet.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("exam9Wallet.DAL.Models.ServiceAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("ServiceProviderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceProviderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ServiceAccounts");
+                });
+
+            modelBuilder.Entity("exam9Wallet.DAL.Models.ServiceProvider", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServiceProviders");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Акнет"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Газпром"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Северэлектро"
+                        });
+                });
+
             modelBuilder.Entity("exam9Wallet.DAL.Models.Transaction", b =>
                 {
                     b.Property<int>("Id")
@@ -317,6 +381,25 @@ namespace exam9Wallet.DAL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("exam9Wallet.DAL.Models.ServiceAccount", b =>
+                {
+                    b.HasOne("exam9Wallet.DAL.Models.ServiceProvider", "ServiceProvider")
+                        .WithMany("ServiceAccounts")
+                        .HasForeignKey("ServiceProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("exam9Wallet.DAL.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceProvider");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("exam9Wallet.DAL.Models.Transaction", b =>
                 {
                     b.HasOne("exam9Wallet.DAL.Models.User", "Receiver")
@@ -332,6 +415,11 @@ namespace exam9Wallet.DAL.Migrations
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("exam9Wallet.DAL.Models.ServiceProvider", b =>
+                {
+                    b.Navigation("ServiceAccounts");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
-﻿using exam9Wallet.BLL.Services;
+﻿using exam9Wallet.BLL.Interfaces;
+using exam9Wallet.BLL.Services;
 using exam9Wallet.DAL.Models;
 using exam9Wallet.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -12,12 +13,18 @@ public class AccountController : Controller
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly UniqueCodeGeneratorService _uniqueCodeGeneratorService;
+    private readonly IServiceAccountService _serviceAccountService;
 
-    public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,  UniqueCodeGeneratorService uniqueCodeGeneratorService)
+    public AccountController(
+        UserManager<User> userManager, 
+        SignInManager<User> signInManager,
+        UniqueCodeGeneratorService uniqueCodeGeneratorService,
+        IServiceAccountService serviceAccountService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _uniqueCodeGeneratorService = uniqueCodeGeneratorService;
+        _serviceAccountService = serviceAccountService;
     }
     
     private int CurrentUserId => int.Parse(_userManager.GetUserId(User)!);
@@ -50,6 +57,8 @@ public class AccountController : Controller
 
             if (result.Succeeded)
             {
+                await _serviceAccountService.CreateDefaultAccountsForUserAsync(user.Id);
+
                 await _signInManager.SignInAsync(user, false);
                 return RedirectToAction("Success", "Account", new { id = user.Id });
             }

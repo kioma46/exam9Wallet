@@ -1,0 +1,47 @@
+﻿@model exam9Wallet.ViewModels.PaymentViewModel
+
+@{
+var providers = ViewBag.Providers as IEnumerable<exam9Wallet.DAL.Models.ServiceProvider>;
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Оплата услуг</h5>
+    </div>
+    <div class="card-body">
+        <div id="paymentAlertContainer" class="alert d-none" role="alert"></div>
+
+        <form id="paymentForm">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="ServiceProviderId" class="form-label">Поставщик услуг</label>
+                <select asp-for="ServiceProviderId" class="form-select" id="ServiceProviderId">
+                    <option value="">-- Выберите поставщика --</option>
+                    @if (providers != null)
+                    {
+                    foreach (var provider in providers)
+                    {
+                    <option value="@provider.Id">@provider.Name</option>
+                    }
+                    }
+                </select>
+                <span asp-validation-for="ServiceProviderId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AccountNumber" class="form-label">Номер счета / Реквизит</label>
+                <input asp-for="AccountNumber" class="form-control" id="AccountNumber" placeholder="Например: ACC-1-1" />
+                <span asp-validation-for="AccountNumber" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Amount" class="form-label">Сумма оплаты</label>
+                <input asp-for="Amount" type="number" step="0.01" class="form-control" id="PaymentAmount" placeholder="0.00" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" id="paymentSubmitBtn">Оплатить</button>
+        </form>
+    </div>
+</div>

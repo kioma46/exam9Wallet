@@ -32,6 +32,8 @@ public class Program
         builder.Services.AddScoped<UniqueCodeGeneratorService>();
         
         builder.Services.AddScoped<ITransactionService, TransactionService>();
+        builder.Services.AddScoped<IServiceProviderService, ServiceProviderService>();
+        builder.Services.AddScoped<IServiceAccountService, ServiceAccountService>();
 
         builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
         
@@ -57,6 +59,21 @@ public class Program
                 pattern: "{controller=Home}/{action=Index}/{id?}")
             .WithStaticAssets();
 
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            try
+            {
+                var serviceAccountService = services.GetRequiredService<IServiceAccountService>();
+                await serviceAccountService.SeedAccountsForAllExistingUsersAsync();
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while seeding service accounts.");
+            }
+        }
+        
         await app.RunAsync();
     }
 }

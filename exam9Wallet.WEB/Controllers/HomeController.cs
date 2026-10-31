@@ -1,3 +1,4 @@
+using exam9Wallet.BLL.Interfaces; // Подключите пространство имен сервиса
 using System.Diagnostics;
 using exam9Wallet.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -6,8 +7,16 @@ namespace exam9Wallet.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
+    private readonly IServiceProviderService _serviceProviderService;
+
+    public HomeController(IServiceProviderService serviceProviderService)
     {
+        _serviceProviderService = serviceProviderService;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        ViewBag.Providers = await _serviceProviderService.GetAll();
         return View();
     }
 
