@@ -27,7 +27,6 @@
                 <ul class="navbar-nav flex-grow-1">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Account" asp-action="Details" asp-route-id="@currentUser?.Id">@User.Identity.Name</a>
                         </li>
@@ -35,6 +34,9 @@
                             <form asp-action="LogOff" asp-controller="Account">
                                 <input class="nav-link text-dark" type="submit" value="Выйти"/>
                             </form>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Transaction" asp-action="Index">Мои транзакции</a>
                         </li>
                     }
                     else

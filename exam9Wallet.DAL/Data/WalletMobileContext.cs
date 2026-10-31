@@ -7,6 +7,8 @@ namespace exam9Wallet.DAL.Data;
 
 public class WalletMobileContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
+    public DbSet<exam9Wallet.DAL.Models.Transaction> Transactions { get; set; } 
+    
     public WalletMobileContext(DbContextOptions<WalletMobileContext> options) : base(options)
     {}
     protected override void OnModelCreating(ModelBuilder builder)

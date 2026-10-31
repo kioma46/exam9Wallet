@@ -1,4 +1,6 @@
-﻿using exam9Wallet.DAL.Models;
+﻿using exam9Wallet.BLL.Interfaces;
+using exam9Wallet.BLL.Services;
+using exam9Wallet.DAL.Models;
 using exam9Wallet.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,71 +14,93 @@ namespace exam9Wallet.Controllers;
 public class BalanceApiController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
+    private readonly ITransactionService _transactionService;
 
-    public BalanceApiController(UserManager<User> userManager)
+    public BalanceApiController(UserManager<User> userManager, ITransactionService transactionService)
     {
         _userManager = userManager;
+        _transactionService = transactionService;
     }
-
-[HttpPost("topup")]
-public async Task<IActionResult> TopUp([FromBody] TopUpViewModel model)
-{
-    if (!ModelState.IsValid)
+    
+    [HttpPost("topup")]
+    public async Task<IActionResult> TopUp([FromBody] TopUpViewModel model)
     {
-        var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-        return BadRequest(new { success = false, message = string.Join(" ", errors) });
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            return BadRequest(new { success = false, message = string.Join(" ", errors) });
+        }
+
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UniqueCode == model.UniqueCode);
+        if (user == null)
+            return BadRequest(new { success = false, message = "Личный счет с таким номером не найден." });
+
+        user.Balance += model.Amount;
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+            return StatusCode(500, new { success = false, message = "Произошла ошибка при обновлении баланса." });
+
+        Transaction transaction = new Transaction()
+        {
+            Date = DateTime.UtcNow,
+            ReceiverId = user.Id,
+            SenderId = null,
+            Amount = model.Amount,
+        };
+    
+        await _transactionService.Add(transaction);
+    
+        return Ok(new {
+            success = true, 
+            message = $"Счет №{user.UniqueCode} успешно пополнен на {model.Amount} сом." 
+        });
     }
 
-    var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UniqueCode == model.UniqueCode);
-    if (user == null)
-        return BadRequest(new { success = false, message = "Личный счет с таким номером не найден." });
+    [HttpPost("transfer")]
+    [Authorize]
+    public async Task<IActionResult> Transfer([FromBody] TransferViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new { success = false, message = "Некорректные данные формы." });
 
-    user.Balance += model.Amount;
-    var result = await _userManager.UpdateAsync(user);
+        var senderId = _userManager.GetUserId(User);
+        if (senderId == null)
+            return Unauthorized(new { success = false, message = "Пользователь не авторизован." });
 
-    if (!result.Succeeded)
-        return StatusCode(500, new { success = false, message = "Произошла ошибка при обновлении баланса." });
+        var sender = await _userManager.FindByIdAsync(senderId);
+        if (sender == null)
+            return BadRequest(new { success = false, message = "Отправитель не найден." });
 
-    return Ok(new { 
-        success = true, 
-        message = $"Счет №{user.UniqueCode} успешно пополнен на {model.Amount} сом." 
-    });
-}
+        if (sender.UniqueCode == model.UniqueCode)
+            return BadRequest(new { success = false, message = "Нельзя переводить средства на собственный счет." });
 
-[HttpPost("transfer")]
-[Authorize]
-public async Task<IActionResult> Transfer([FromBody] TransferViewModel model)
-{
-    if (!ModelState.IsValid)
-        return BadRequest(new { success = false, message = "Некорректные данные формы." });
+        if (sender.Balance < model.Amount)
+            return BadRequest(new { success = false, message = "Недостаточно средств на балансе." });
 
-    var senderId = _userManager.GetUserId(User);
-    if (senderId == null)
-        return Unauthorized(new { success = false, message = "Пользователь не авторизован." });
+        var recipient = await _userManager.Users.FirstOrDefaultAsync(u => u.UniqueCode == model.UniqueCode);
+        if (recipient == null)
+            return BadRequest(new { success = false, message = "Счет получателя не найден." });
 
-    var sender = await _userManager.FindByIdAsync(senderId);
-    if (sender == null)
-        return BadRequest(new { success = false, message = "Отправитель не найден." });
+        sender.Balance -= model.Amount;
+        recipient.Balance += model.Amount;
 
-    if (sender.UniqueCode == model.UniqueCode)
-        return BadRequest(new { success = false, message = "Нельзя переводить средства на собственный счет." });
+        Transaction transaction = new Transaction()
+        {
+            Date =  DateTime.UtcNow,
+            ReceiverId = recipient.Id,
+            SenderId = sender.Id,
+            Amount = model.Amount,
+        };
+    
+        await _transactionService.Add(transaction);
+    
+        await _userManager.UpdateAsync(sender);
+        await _userManager.UpdateAsync(recipient);
 
-    if (sender.Balance < model.Amount)
-        return BadRequest(new { success = false, message = "Недостаточно средств на балансе." });
-
-    var recipient = await _userManager.Users.FirstOrDefaultAsync(u => u.UniqueCode == model.UniqueCode);
-    if (recipient == null)
-        return BadRequest(new { success = false, message = "Счет получателя не найден." });
-
-    sender.Balance -= model.Amount;
-    recipient.Balance += model.Amount;
-
-    await _userManager.UpdateAsync(sender);
-    await _userManager.UpdateAsync(recipient);
-
-    return Ok(new { 
-        success = true, 
-        message = $"Перевод на сумму {model.Amount:N2} сом успешно выполнен. Текущий баланс: {sender.Balance:N2} сом." 
-    });
-}
+        return Ok(new { 
+            success = true, 
+            message = $"Перевод на сумму {model.Amount:N2} сом успешно выполнен. Текущий баланс: {sender.Balance:N2} сом." 
+        });
+    }
 }

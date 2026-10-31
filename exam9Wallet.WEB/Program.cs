@@ -1,7 +1,10 @@
 
+using exam9Wallet.BLL.Interfaces;
 using exam9Wallet.BLL.Services;
 using exam9Wallet.DAL.Data;
+using exam9Wallet.DAL.Interfaces;
 using exam9Wallet.DAL.Models;
+using exam9Wallet.DAL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +30,10 @@ public class Program
         });
         
         builder.Services.AddScoped<UniqueCodeGeneratorService>();
+        
+        builder.Services.AddScoped<ITransactionService, TransactionService>();
+
+        builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
         
         var app = builder.Build();
 
