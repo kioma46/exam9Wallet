@@ -6,7 +6,7 @@ public class LoginViewModel
 
 {
     [Required]
-    [Display(Name = "Enter your Username or Email")]
+    [Display(Name = "Enter your 6-digit account number or Email")]
     public string LoginOrEmail { get; set; }
  
     [Required]
@@ -17,5 +17,4 @@ public class LoginViewModel
     [Display(Name = "Remember?")]
     public bool RememberMe { get; set; }
     public string? ReturnUrl { get; set; }
-
 }

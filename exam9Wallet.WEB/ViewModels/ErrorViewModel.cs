@@ -1,4 +1,4 @@
-namespace exam9Wallet.Models;
+namespace exam9Wallet.ViewModels;
 
 public class ErrorViewModel
 {

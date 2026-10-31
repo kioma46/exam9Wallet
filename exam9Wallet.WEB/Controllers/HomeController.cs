@@ -1,6 +1,6 @@
 using System.Diagnostics;
+using exam9Wallet.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using exam9Wallet.Models;
 
 namespace exam9Wallet.Controllers;
 

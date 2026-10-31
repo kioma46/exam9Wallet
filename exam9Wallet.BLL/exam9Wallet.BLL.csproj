@@ -10,8 +10,4 @@
       <ProjectReference Include="..\exam9Wallet.DAL\exam9Wallet.DAL.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="DTOs\" />
-    </ItemGroup>
-
 </Project>

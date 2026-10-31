@@ -44,6 +44,7 @@ public class AccountController : Controller
                 ProfilePictureUrl = model.ProfilePictureUrl,
                 DateOfBirth = model.DateOfBirth,
                 UniqueCode = await _uniqueCodeGeneratorService.GenerateUniqueCodeAsync(),
+                Balance = 100000
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -80,9 +81,11 @@ public class AccountController : Controller
         if (loginOrEmail != null)
         {
             User? user = await _userManager.FindByEmailAsync(loginOrEmail);
-            if (user == null)
+
+            if (user == null && !string.IsNullOrEmpty(loginOrEmail) && loginOrEmail.All(char.IsDigit))
             {
-                user = await _userManager.FindByNameAsync(loginOrEmail);
+                int uniqueCode = int.Parse(loginOrEmail);
+                user = _userManager.Users.FirstOrDefault(u => u.UniqueCode == uniqueCode);
             }
 
             if (user == null)
@@ -118,7 +121,7 @@ public class AccountController : Controller
         ModelState.AddModelError(string.Empty, "Invalid login or password");
         return View(model);
     }
-
+    
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize]
