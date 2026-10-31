@@ -1,4 +1,4 @@
-﻿// Controllers/PaymentController.cs
+﻿
 using exam9Wallet.BLL.Interfaces;
 using exam9Wallet.DAL.Data;
 using exam9Wallet.DAL.Models;

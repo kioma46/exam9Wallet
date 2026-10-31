@@ -1,4 +1,4 @@
-using exam9Wallet.BLL.Interfaces; // Подключите пространство имен сервиса
+using exam9Wallet.BLL.Interfaces;
 using System.Diagnostics;
 using exam9Wallet.ViewModels;
 using Microsoft.AspNetCore.Mvc;
