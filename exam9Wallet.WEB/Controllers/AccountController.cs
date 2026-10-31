@@ -43,7 +43,7 @@ public class AccountController : Controller
                 Email = model.Email,
                 ProfilePictureUrl = model.ProfilePictureUrl,
                 DateOfBirth = model.DateOfBirth,
-                UniqueCode = await _uniqueCodeGeneratorService.GenerateUniqueCodeAsync()
+                UniqueCode = await _uniqueCodeGeneratorService.GenerateUniqueCodeAsync(),
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);

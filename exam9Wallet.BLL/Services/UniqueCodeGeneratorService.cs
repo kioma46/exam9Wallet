@@ -13,7 +13,6 @@ public class UniqueCodeGeneratorService
     public async Task<int> GenerateUniqueCodeAsync()
     {
         Random rnd = new Random();
-        
         while (true)
         {
             int code = rnd.Next(100000, 1000000);
