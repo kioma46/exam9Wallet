@@ -15,9 +15,21 @@ public class ValidationController : Controller
     
     public bool ValidatePhoneNumber(string PhoneNumber) => PhoneNumber.All(char.IsDigit);
     
-    public bool ValidateEmail(string Email) => !_userManager.Users.Any(u => u.Email == Email);
+    public bool ValidateEmail(string email, int? id)
+    {
+        if (id == null)
+            return !_userManager.Users.Any(u => u.Email == email);
+        
+        return !_userManager.Users.Any(u => u.Email == email && u.Id != id.Value);
+    }
     
-    public bool ValidateUserName(string UserName) => !_userManager.Users.Any(u => u.UserName == UserName);
+    public bool ValidateUserName(string userName, int? id)
+    {
+        if (id == null)
+            return !_userManager.Users.Any(u => u.UserName == userName);
+        
+        return !_userManager.Users.Any(u => u.UserName == userName && u.Id != id.Value);
+    }
     
     public bool ValidatePassword(string Password) => Password.Length >= 8 && Password.Any(char.IsDigit) && Password.Any(char.IsUpper) && Password.Any(c => !char.IsLetter(c));
 

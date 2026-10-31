@@ -21,9 +21,8 @@ public class AccountController : Controller
     }
     
     private int CurrentUserId => int.Parse(_userManager.GetUserId(User)!);
-    private bool IsAdmin => User.IsInRole("Admin");
-    // GET
-
+    
+    
 
     [HttpGet]
     public IActionResult Register()
@@ -51,9 +50,8 @@ public class AccountController : Controller
 
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, "User");
                 await _signInManager.SignInAsync(user, false);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Success", "Account", new { id = user.Id });
             }
 
             foreach (var error in result.Errors)
@@ -142,7 +140,7 @@ public class AccountController : Controller
     {
         if (userId != null)
         {
-            if (userId != CurrentUserId && !IsAdmin)
+            if (userId != CurrentUserId)
                 return Forbid();
 
             User? user = _userManager.Users.FirstOrDefault(u => u.Id == userId.Value);
@@ -200,5 +198,35 @@ public class AccountController : Controller
         }
 
         return View(uevm);
+    }
+
+    [Authorize]
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id != null)
+        {
+            User? user = await _userManager.FindByIdAsync(id.Value.ToString());
+            
+            if (user != null)
+                return View(user);
+            
+            return NotFound();
+        }
+        return BadRequest(ModelState);
+    }
+
+    [Authorize]
+    public async Task<IActionResult> Success(int? id)
+    {
+        if (id != null)
+        {
+            User? user = await _userManager.FindByIdAsync(id.Value.ToString());
+            
+            if (user != null)
+                return View(user);
+            
+            return NotFound();
+        }
+        return BadRequest(ModelState);
     }
 }

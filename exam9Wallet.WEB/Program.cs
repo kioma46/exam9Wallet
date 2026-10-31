@@ -47,7 +47,7 @@ public class Program
         app.MapStaticAssets();
         app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Restaurant}/{action=RestaurantList}/{id?}")
+                pattern: "{controller=Home}/{action=Index}/{id?}")
             .WithStaticAssets();
 
         await app.RunAsync();

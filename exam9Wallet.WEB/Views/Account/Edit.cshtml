@@ -1,0 +1,45 @@
+﻿@model exam9Wallet.ViewModels.UserEditViewModel
+
+@{
+    ViewBag.Title = "Edit Profile";
+}
+
+<form class="w-50 mx-auto px-1 py-3 border rounded-3 bg-light" method="post" asp-controller="Account" asp-action="Edit">
+    <!-- Скрытое поле для Id пользователя -->
+    <input type="hidden" asp-for="Id" />
+    
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="UserName">Login</label><br />
+        <input class="form-control w-100" required asp-for="UserName" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="Email"></label><br />
+        <input class="form-control w-100" required asp-for="Email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="ProfilePictureUrl"></label><br />
+        <input class="form-control w-100" required asp-for="ProfilePictureUrl" />
+        <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
+    </div>
+
+    <div class="mb-2 w-75 mx-auto form-group">
+        <label asp-for="DateOfBirth"></label><br />
+        <input type="date" class="form-control w-50 mx-auto" required asp-for="DateOfBirth" asp-format="{0:yyyy-MM-dd}" />
+        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+    </div>
+
+    <div class="mt-3 w-75 mx-auto form-group d-flex gap-2">
+        <input class="btn btn-primary w-100" type="submit" value="Save Changes" />
+        <a class="btn btn-secondary w-100" asp-controller="Account" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

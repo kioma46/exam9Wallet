@@ -1,0 +1,55 @@
+﻿@model exam9Wallet.DAL.Models.User
+
+@{
+    ViewData["Title"] = "Личный кабинет";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 text-center">
+            <div class="card shadow-sm p-3 mb-4 bg-body rounded">
+                <div class="card-body">
+                    <img src="@Model.ProfilePictureUrl" alt="Avatar" class="rounded-circle img-thumbnail mb-3" style="width: 150px; height: 150px; object-fit: cover;" />
+                    
+                    <h4 class="card-title">@Model.UserName</h4>
+                    <p class="text-muted">@Model.Email</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Account" asp-action="Edit" asp-route-userId="@Model.Id" class="btn btn-outline-primary btn-sm">Редактировать профиль</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm text-white bg-success mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Состояние счета</h5>
+                    <h2 class="display-5 fw-bold">@Model.Balance.ToString("N2") сом</h2>
+                    <p class="card-text mb-0">Текущий баланс вашего кошелька</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm p-3 bg-body rounded">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Информация об аккаунте</h5>
+                    
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Личный счет (Номер):</span>
+                            <span class="badge bg-primary fs-6">@Model.UniqueCode</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Дата рождения:</span>
+                            <span>@Model.DateOfBirth.ToString("dd.MM.yyyy")</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Email:</span>
+                            <span>@Model.Email</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
